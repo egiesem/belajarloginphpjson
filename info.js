@@ -1,14 +1,28 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import {
   AppRegistry,
   StyleSheet,
-  Text,
-  StatusBar,
-  View
-} from 'react-native';
-import { COLOR, ThemeProvider, Toolbar } from 'react-native-material-ui';
-import Container from '../Container';
 
+  StatusBar,
+  Image,
+  
+  TextInput
+} from 'react-native';
+import { COLOR, ThemeProvider, Toolbar} from 'react-native-material-ui';
+import { Card,  FormLabel, FormInput } from "react-native-elements";
+//import Container from '../Container';
+//import { connect } from 'react-redux';
+import { Container, Content, Item, Input, Button, Icon, View, Text } from 'native-base';
+import { Actions } from 'react-native-router-flux';
+
+import { setUser } from './user';
+import styles from './styles';
+const background = require('./images/shadow.png');
+
+
+var SERVER_LOGIN_URL = 'http://192.168.43.147/backend/login.php';
+
+//import SignupSection from './keboo/SignupSection';
 const uiTheme = {
   palette: {
     primaryColor: COLOR.green500,
@@ -23,45 +37,120 @@ const uiTheme = {
 };
 
 export default class InfoView extends Component {
+// static propTypes = {
+//     setUser: React.PropTypes.func,
+//   }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+    
+
+
+   };
+ }
+    login() {
+    // if (this.state.username === '') {
+    //   showMessage("Something is bad", "Username cannot be empty");
+    //   return;
+    // }
+    // if (this.state.password === '') {
+    //   showMessage("Something is bad", "Password cannot be empty");
+    //   return;
+    // }
+    // this.showProgressBar();
+    fetch(SERVER_LOGIN_URL + '?username=' + this.state.username + '&password=' + this.state.password)
+      .then((response) => response.json())
+      .then((responseData) => {
+        var id = responseData.id;
+        if (id === -1) {
+          const {navigate}= this.props.navigation;
+           navigate('Info');
+        //   this.hideProgressBar();
+        //   showMessage("Something is bad", "Invalid username and/or password");
+         }
+         else 
+       {
+        const {navigate}= this.props.navigation;
+           navigate('Home');
+            // password: this.state.password,
+            // id: id,
+            // username: this.state.username
+        }  
+        
+      })
+      .done();
+  }
+
+// var InfoView = React.createClass({
+//   getInitialState: function() {
+//     return {
+//       username: "",
+//       password: "",
+//       loading: false,
+//     };
+//   },
+
+
+  // setUser(name) {
+  //   this.props.setUser(name);
+  // }
+
+  
   render() {
     return (
-      <ThemeProvider uiTheme={uiTheme}>
-        <Container>
-          <StatusBar backgroundColor="rgba(0, 0, 0, 0.2)" translucent />
-          <Toolbar
-            leftElement="close"
-            onLeftElementPress={() => this.props.navigation.navigate('Home')}
-            centerElement="Info"
-          />
-          <View style={styles.container}>
-            <Text style={styles.welcome}>
-              Welcome to Info View
-            </Text>
-          </View>
-        </Container>
-      </ThemeProvider>
+     
+      <Container>
+        <View style={styles.container}>
+          <Content>
+            <Image source={background} style={styles.shadow}>
+              <View style={styles.bg}>
+                <Item style={styles.input}>
+                  <Icon active name="person" />
+                  <Input 
+                  placeholder="Username"  text = {this.state.username} 
+                  onChangeText = {(e) => this.setState({username: e})} 
+                  />
+                </Item>
+                <Item style={styles.input}>
+                  <Icon name="unlock" />
+                  <Input
+                    placeholder="Password"
+                    text = {this.state.password}
+                    secureTextEntry
+                    onChangeText = {(e) => this.setState({password: e})}
+                    
+                  />
+                </Item>
+         <View style={styles.te}>
+        
+        <Text style={styles.te1}
+        onPress={() => this.props.navigation.navigate('Bookmark')}>Create Account</Text>
+         
+        <Text style={styles.text}
+        onPress={() => this.props.navigation.navigate('Client')}>Forgot Password?</Text>
+      </View>
+
+                <Button style={styles.btn} 
+                onPress={() => this.login()}> 
+                  <Text>Login</Text>
+                </Button>
+                  
+      </View>
+
+        
+              
+            </Image>
+
+          </Content>
+
+        </View>
+      </Container>
+      
     );
   }
 }
+// });
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  header: {
-    backgroundColor: '#455A64',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
